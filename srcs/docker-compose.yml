@@ -3,7 +3,7 @@ services:
     build:
       context: ./requirements/mariadb
       dockerfile: Dockerfile
-    image: mariadb
+    image: mariadb:inception # add a tag so docker dosent use "latest"
     container_name: mariadb
     restart: always
     env_file:
@@ -16,13 +16,52 @@ services:
     networks:
       - inception_network
 
+  wordpress:
+    build:
+      context: ./requirements/wordpress
+      dockerfile: Dockerfile
+    image: wordpress:inception
+    container_name: wordpress
+    restart: always
+    depends_on:
+      - mariadb
+    env_file:
+      - .env
+    secrets:
+      - db_password
+      - db_root_password
+      - credentials
+    volumes:
+      - wordpress_volume:/var/www/html
+    networks:
+      - inception_network
+  nginx:
+    build:
+      context: ./requirements/nginx
+      dockerfile: Dockerfile
+    image: nginx:inception
+    container_name: nginx
+    restart: always
+    depends_on:
+      - wordpress
+    ports:
+      - "443:443"
+    networks:
+      - inception_network
+
 volumes:
   db_volume:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /Users/anaiscaire/data/mariadb
+      device: ${DATA_PATH}/mariadb
+  wordpress_volume:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATA_PATH}/wordpress
 
 networks:
   inception_network:
@@ -33,3 +72,5 @@ secrets:
     file: ../secrets/db_password.txt
   db_root_password:
     file: ../secrets/db_root_password.txt
+  credentials:
+    file: ../secrets/credentials.txt

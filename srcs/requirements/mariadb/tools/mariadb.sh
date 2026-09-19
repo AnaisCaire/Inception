@@ -21,7 +21,7 @@ if [ ! -d "/var/lib/mysql/$MYSQL_DATABASE" ]; then
     mysql -u root -e "CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;"
     
     # Create the administrator user (must not contain 'admin') and grant full privileges
-    mysql -u root -e "CREATE USER IF NOT EXISTS \`${MYSQL_USER}\`@'%' IDENTIFIED BY '${DB_ROOT_PWD}';"
+    mysql -u root -e "CREATE USER IF NOT EXISTS \`${MYSQL_USER}\`@'%' IDENTIFIED BY '${DB_PWD}';"
     mysql -u root -e "GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO \`${MYSQL_USER}\`@'%';"
     
     # Create the secondary standard user and grant limited privileges
